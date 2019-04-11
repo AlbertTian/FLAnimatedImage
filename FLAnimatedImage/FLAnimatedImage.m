@@ -228,7 +228,14 @@ static NSHashTable *allAnimatedImagesWeak;
         //     };
         // }
         NSDictionary *imageProperties = (__bridge_transfer NSDictionary *)CGImageSourceCopyProperties(_imageSource, NULL);
-        _loopCount = [[[imageProperties objectForKey:(id)kCGImagePropertyGIFDictionary] objectForKey:(id)kCGImagePropertyGIFLoopCount] unsignedIntegerValue];
+        NSNumber *loopCount = [[imageProperties objectForKey:(id)kCGImagePropertyGIFDictionary] objectForKey:(id)kCGImagePropertyGIFLoopCount];
+        if (loopCount == nil) {
+            _loopCount = 1;
+        } else if (loopCount.unsignedIntegerValue > 0) {
+            _loopCount = loopCount.unsignedIntegerValue + 1;
+        } else {
+            _loopCount = 0;
+        }
         
         // Iterate through frame images
         size_t imageCount = CGImageSourceGetCount(_imageSource);
